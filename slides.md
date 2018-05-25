@@ -1,41 +1,66 @@
-## Demo 1
-Slide 1
+## Motivation
+
+* What if upstream tests are passing but your package is broken?
+* What if openQA system tests are too late or too broad?
+
+''Example project:''
+https://build.opensuse.org/package/show/network:messaging:matrix/matrix-synapse
 
 ---
 
-## Demo 2
-Slide 3
+## What do you need?
 
----
+Two files:
 
-## Demo 3
-Slide 3.1
+* _multibuild
 
---
-
-## Demo 3
-Slide 3.2
-
-```rust
-fn main() {
-    // A simple integer calculator:
-    // `+` or `-` means add or subtract by 1
-    // `*` or `/` means multiply or divide by 2
-
-    let program = "+ + * - /";
-    let mut accumulator = 0;
-
-    for token in program.chars() {
-        match token {
-            '+' => accumulator += 1,
-            '-' => accumulator -= 1,
-            '*' => accumulator *= 2,
-            '/' => accumulator /= 2,
-            _ => { /* ignore everything else */ }
-        }
-    }
-
-    println!("The program \"{}\" calculates the value {}",
-              program, accumulator);
-}
+```yaml
+<multibuild>
+    <package>test</package>
+</multibuild>
 ```
+
+---
+
+## … and <package>.spec
+
+```yaml
+%if "@BUILD_FLAVOR@" == ""
+%define _test 0
+…
+%endif
+
+Name:           %{short_name}%{?name_ext}
+…
+%if 0%{?_test}
+BuildRequires:  %{short_name}
+%else
+BuildRequires:  %{python_module base}
+Requires:       python-bcrypt
+…
+
+%build
+%if 0%{?_test}
+synctl start
+register_new_matrix_user --config homeserver.yaml --user opensuse --password opensuse --admin https://localhost:8448
+%else
+%python_build
+```
+
+---
+
+## build + test results
+
+<img src="img/obs_example.png"/>
+
+---
+
+## … and <package>.spec
+
+… and some boiler plate
+```yaml
+(another 20 ugly lines of %if/%else in the spec file)
+```
+
+ideas for improvements?
+

@@ -62,5 +62,11 @@ register_new_matrix_user --config homeserver.yaml --user opensuse --password ope
 (another 20 ugly lines of %if/%else in the spec file)
 ```
 
+---
+
+## not all people like that
+
+<img src="img/declined.png"/>
+
 ideas for improvements?
 
